@@ -1,0 +1,36 @@
+{
+    "manifestVersion": 1,
+    "id": "use-haxe-version",
+    "name": "Use Haxe Version",
+    "version": "0.1.1",
+    "publisher": "onthewings",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "Use the specified version of Haxe, adding it to the PATH",
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "icons": {
+        "default": "images/icon.png"
+    },
+    "files": [
+        {
+            "path": "UseHaxeVersion"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "custom-use-haxe-version",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "UseHaxeVersion"
+            }
+        }
+    ]
+}

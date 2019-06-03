@@ -13,17 +13,32 @@ class Main {
     static var platform(default, never):String = Os.platform();
 
     static function haxeUrl(version:String):String {
-        var file = switch (platform) {
-            case "win32":
-                'haxe-${version}-win.zip';
-            case "darwin":
-                'haxe-${version}-osx.tar.gz';
-            case "linux":
-                'haxe-${version}-linux64.tar.gz';
+        switch (version) {
+            case "development":
+                var file = switch (platform) {
+                    case "win32":
+                        "windows/haxe_latest.zip";
+                    case "darwin":
+                        "mac/haxe_latest.tar.gz";
+                    case "linux":
+                        "linux64/haxe_latest.tar.gz";
+                    case _:
+                        throw "unsupported platform: " + platform;
+                }
+                return 'https://build.haxe.org/builds/haxe/${file}';
             case _:
-                throw "unsupported platform: " + platform;
-        }
-        return 'https://haxe.org/website-content/downloads/${version}/downloads/${file}';
+                var file = switch (platform) {
+                    case "win32":
+                        'haxe-${version}-win.zip';
+                    case "darwin":
+                        'haxe-${version}-osx.tar.gz';
+                    case "linux":
+                        'haxe-${version}-linux64.tar.gz';
+                    case _:
+                        throw "unsupported platform: " + platform;
+                }
+                return 'https://haxe.org/website-content/downloads/${version}/downloads/${file}';
+        };
     }
 
     static function nekoUrl(version:String):String {
@@ -64,7 +79,7 @@ class Main {
             });
     }
 
-    static function acquireHaxe(version:String):Promise<String> {
+    static function acquireHaxe(version:String, cache:Bool):Promise<String> {
         var url = haxeUrl(version);
         var fileName = Path.withoutDirectory(url);
         return Tool.downloadTool(url)
@@ -78,7 +93,11 @@ class Main {
             })
             .then(function(extPath:String) {
                 var subDir = getOnlySubDir(extPath);
-                return Tool.cacheDir(subDir, "haxe", version);
+                return if (cache) {
+                    Tool.cacheDir(subDir, "haxe", version);
+                } else {
+                    Promise.resolve(subDir);
+                }
             });
     }
 
@@ -141,10 +160,13 @@ class Main {
         try {
             var versionSpec = Task.getInput("versionSpec", true);
 
-            var haxeVersion:Promise<String> = if (Tool.isExplicitVersion(versionSpec)) {
-                Promise.resolve(versionSpec);
-            } else {
-                queryLatestHaxeVersionMatch(versionSpec);
+            var haxeVersion:Promise<String> = switch (versionSpec) {
+                case "development":
+                    Promise.resolve("development");
+                case v if (Tool.isExplicitVersion(v)):
+                    Promise.resolve(v);
+                case _:
+                    queryLatestHaxeVersionMatch(versionSpec);
             }
 
             var nekoInstallDir:Promise<String> = switch (Tool.findLocalTool("neko", nekoVersion)) {
@@ -154,12 +176,17 @@ class Main {
                     Promise.resolve(p);
             };
             var haxeInstallDir:Promise<String> = haxeVersion.then(function(haxeVersion:String) {
-                return switch (Tool.findLocalTool("haxe", haxeVersion)) {
-                    case null:
-                        acquireHaxe(haxeVersion);
-                    case p:
-                        Promise.resolve(p);
-                };
+                return switch (haxeVersion) {
+                    case "development":
+                        acquireHaxe(haxeVersion, false);
+                    case _:
+                        switch (Tool.findLocalTool("haxe", haxeVersion)) {
+                            case null:
+                                acquireHaxe(haxeVersion, true);
+                            case p:
+                                Promise.resolve(p);
+                        };
+                }
             });
 
             Promise.all([

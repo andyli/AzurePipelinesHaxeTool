@@ -3,7 +3,9 @@ import azure_pipelines_tool_lib.Tool;
 import js.Promise;
 import js.node.*;
 import haxe.io.*;
+import sys.*;
 using StringTools;
+using Lambda;
 
 class Main {
     static var nekoVersion(default, never):String = "2.2.0";
@@ -91,6 +93,31 @@ class Main {
     static function handleNekoInstallPath(path:String):Null<Void> {
         Tool.prependPath(path);
         Task.setVariable("NEKOPATH", path);
+
+        switch (platform) {
+            case "darwin", "linux":
+                Task.execSync("sudo", ["mkdir", "-p", "/usr/local/lib/"]);
+                FileSystem.readDirectory(path)
+                    .filter(function(item) return item.startsWith("libneko."))
+                    .iter(function(itm){
+                        Task.execSync("sudo", ["ln", "-s", Path.join([path, itm]), "/usr/local/lib/"]);
+                    });
+                Task.execSync("sudo", ["mkdir", "-p", "/usr/local/lib/neko/"]);
+                FileSystem.readDirectory(path)
+                    .filter(function(item) return item.endsWith(".ndll"))
+                    .iter(function(itm){
+                        Task.execSync("sudo", ["ln", "-s", Path.join([path, itm]), "/usr/local/lib/neko/"]);
+                    });
+            case _:
+                //pass
+        }
+
+        switch (platform) {
+            case "linux":
+                Task.execSync("sudo", ["ldconfig"]);
+            case _:
+                //pass
+        }
         return null;
     }
 

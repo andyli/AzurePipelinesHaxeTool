@@ -31,22 +31,26 @@ class Main {
     }
 
     static function acquireHaxe(version:String):Promise<String> {
-        return Tool.downloadTool(haxeUrl(version))
+        var url = haxeUrl(version);
+        var fileName = Path.withoutDirectory(url);
+        return Tool.downloadTool(url)
             .then(function(downloadPath:String) {
-                if (downloadPath.endsWith(".tar.gz"))
+                if (fileName.endsWith(".tar.gz"))
                     return Tool.extractTar(downloadPath);
-                else if (downloadPath.endsWith(".zip"))
+                else if (fileName.endsWith(".zip"))
                     return Tool.extractZip(downloadPath);
                 else
-                    throw 'No idea of how to handle $downloadPath';
+                    throw 'No idea of how to handle $fileName';
             })
             .then(function(extPath:String) {
-                return Tool.cacheDir(getOnlySubDir(extPath));
+                var subDir = getOnlySubDir(extPath);
+                return Tool.cacheDir(subDir, "haxe", version);
             });
     }
 
     static function handleHaxeInstallPath(path:String):Void {
         Tool.prependPath(path);
+        Task.setVariable("HAXE_STD_PATH", Path.join([path, "std"]));
         Task.setResult(TaskResult.Succeeded, "");
     }
 
@@ -59,7 +63,11 @@ class Main {
             installDir = Tool.findLocalTool("Haxe", versionSpec);
 
             if (installDir == null) {
-                acquireHaxe(versionSpec).then(handleHaxeInstallPath);
+                acquireHaxe(versionSpec)
+                    .then(handleHaxeInstallPath)
+                    .catchError(function(e:js.Error){
+                        Task.setResult(TaskResult.Failed, e.message);
+                    });
             } else {
                 handleHaxeInstallPath(installDir);
             }

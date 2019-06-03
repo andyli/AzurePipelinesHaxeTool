@@ -21,7 +21,7 @@ extern class Task {
     static public function getVariable(args:Rest<Dynamic>):Dynamic;
     static public function assertAgent(args:Rest<Dynamic>):Dynamic;
     static public function getVariables(args:Rest<Dynamic>):Dynamic;
-    static public function setVariable(args:Rest<Dynamic>):Dynamic;
+    static public function setVariable(name:String, val:String, ?secret:Bool):Void;
     static public function setSecret(args:Rest<Dynamic>):Dynamic;
     static public function getInput(args:Rest<Dynamic>):Dynamic;
     static public function getBoolInput(args:Rest<Dynamic>):Dynamic;

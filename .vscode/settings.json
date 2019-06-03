@@ -1,0 +1,5 @@
+{
+    "haxe.configurations": [
+        ["--cwd", "UseHaxeVersion", "build.hxml"]
+    ]
+}

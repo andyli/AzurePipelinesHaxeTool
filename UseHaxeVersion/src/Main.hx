@@ -4,6 +4,7 @@ import js.Promise;
 import js.node.*;
 import haxe.io.*;
 import sys.*;
+import Fetch.*;
 using StringTools;
 using Lambda;
 
@@ -46,6 +47,21 @@ class Main {
             case items:
                 throw '$path should contain only one sub-directory. It now has ${items.join(", ")}.';
         }
+    }
+
+    static function queryLatestHaxeVersionMatch(versionSpec:String):Promise<String> {
+        return fetch("https://haxe.org/website-content/downloads/versions.json")
+            .then(function(res) return res.json())
+            .then(function(json:{
+                current:String,
+                versions:Array<{
+                    date:String,
+                    version:String,
+                    tag:String,
+                }>,
+            }) {
+                return Tool.evaluateVersions(json.versions.map(function(o) return o.version), versionSpec);
+            });
     }
 
     static function acquireHaxe(version:String):Promise<String> {
@@ -125,18 +141,26 @@ class Main {
         try {
             var versionSpec = Task.getInput("versionSpec", true);
 
+            var haxeVersion:Promise<String> = if (Tool.isExplicitVersion(versionSpec)) {
+                Promise.resolve(versionSpec);
+            } else {
+                queryLatestHaxeVersionMatch(versionSpec);
+            }
+
             var nekoInstallDir:Promise<String> = switch (Tool.findLocalTool("neko", nekoVersion)) {
                 case null:
                     acquireNeko(nekoVersion);
                 case p:
                     Promise.resolve(p);
             };
-            var haxeInstallDir:Promise<String> = switch (Tool.findLocalTool("haxe", versionSpec)) {
-                case null:
-                    acquireHaxe(versionSpec);
-                case p:
-                    Promise.resolve(p);
-            };
+            var haxeInstallDir:Promise<String> = haxeVersion.then(function(haxeVersion:String) {
+                return switch (Tool.findLocalTool("haxe", haxeVersion)) {
+                    case null:
+                        acquireHaxe(haxeVersion);
+                    case p:
+                        Promise.resolve(p);
+                };
+            });
 
             Promise.all([
                 nekoInstallDir.then(handleNekoInstallPath),

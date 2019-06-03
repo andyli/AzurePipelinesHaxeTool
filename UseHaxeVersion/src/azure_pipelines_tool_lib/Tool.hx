@@ -9,7 +9,7 @@ extern class Tool {
     static public function prependPath(args:Rest<Dynamic>):Dynamic;
     static public function isExplicitVersion(args:Rest<Dynamic>):Dynamic;
     static public function cleanVersion(args:Rest<Dynamic>):Dynamic;
-    static public function evaluateVersions(args:Rest<Dynamic>):Dynamic;
+    static public function evaluateVersions(versions:Array<String>, versionSpec:String):String;
     static public function findLocalTool(args:Rest<Dynamic>):Dynamic;
     static public function findLocalToolVersions(args:Rest<Dynamic>):Dynamic;
     static public function downloadTool(fileUrl:String):Promise<String>;

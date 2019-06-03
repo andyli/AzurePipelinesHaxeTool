@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "use-haxe-version",
     "name": "Use Haxe Version",
-    "version": "0.1.11",
+    "version": "0.1.13",
     "publisher": "onthewings",
     "targets": [
         {

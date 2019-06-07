@@ -17,7 +17,7 @@ class Main {
             case "development":
                 var file = switch (platform) {
                     case "win32":
-                        "windows/haxe_latest.zip";
+                        "windows64/haxe_latest.zip";
                     case "darwin":
                         "mac/haxe_latest.tar.gz";
                     case "linux":

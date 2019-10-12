@@ -32,5 +32,12 @@
                 "name": "HaxeTool"
             }
         }
-    ]
+    ],
+    "galleryFlags": [
+        "Preview"
+    ],
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/andyli/AzurePipelinesHaxeTool"
+    }
 }

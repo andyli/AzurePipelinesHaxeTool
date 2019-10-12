@@ -8,4 +8,7 @@ HaxeTool/main.js: always
 vsix: HaxeTool/main.js
 	tfx extension create --manifest-globs vss-extension.json
 
-.PHONY: all vsix always
+publish:
+	@tfx extension publish --token $(AZURE_TOKEN)
+
+.PHONY: all vsix always publish

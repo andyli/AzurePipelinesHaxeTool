@@ -52,6 +52,9 @@ stages:
             displayName: publish extension
 
 trigger:
+  branches:
+    include:
+    - '*'
   tags:
     include:
       - v*

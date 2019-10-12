@@ -7,8 +7,9 @@ stages:
         steps:
           - bash: |
               set -ex
-              sudo apt update
-              sudo apt install -qqy jq
+              sudo add-apt-repository ppa:haxe/haxe3.4 -y
+              sudo apt update -y
+              sudo apt install -qqy haxe jq
               sudo npm install -g tfx-cli
             displayName: Install dependencies
           - bash: make
@@ -20,7 +21,7 @@ stages:
           - publish: $[ variables.VSIXFILE ]
             artifact: vsix
   - stage: StagePublish
-    condition: and(succeeded(), not(variables['System.PullRequest.PullRequestId']), variables['AZURE_TOKEN'])
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), variables['AZURE_TOKEN'])
     jobs:
       - job: Publish
         pool:
@@ -28,7 +29,7 @@ stages:
         steps:
           - bash: |
               set -ex
-              sudo apt update
+              sudo apt update -y
               sudo apt install -qqy jq
               sudo npm install -g tfx-cli
             displayName: Install dependencies

@@ -26,7 +26,7 @@ stages:
           - bash: make
             displayName: Build
           - publish: output
-            artifact: vsix
+            artifact: output
   - stage: StagePublish
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), '$(AZURE_TOKEN)')
     jobs:
@@ -45,7 +45,7 @@ stages:
               sudo npm install -g tfx-cli
             displayName: Install dependencies
           - download: current
-            artifact: vsix
+            artifact: output
           - bash: make publish
             env:
               AZURE_TOKEN: $(AZURE_TOKEN)

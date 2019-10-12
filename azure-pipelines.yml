@@ -21,6 +21,12 @@ stages:
             displayName: Build
           - publish: output
             artifact: vsix
+          - bash: |
+              set -ex
+              [ "`jq -r .version vss-extension.json`" == "`jq -r '.version | "\(.Major).\(.Minor).\(.Patch)"' HaxeTool/task.json`" ]
+              [ "`jq -r .version vss-extension.json`" == "`jq -r .version HaxeTool/package.json`" ]
+              [ "`jq -r .version HaxeTool/package.json`" == "`jq -r .version HaxeTool/package-lock.json`" ]
+            displayName: Check version
   - stage: StagePublish
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), variables['AZURE_TOKEN'])
     jobs:

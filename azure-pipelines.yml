@@ -12,6 +12,11 @@ stages:
               sudo apt install -qqy haxe jq
               sudo npm install -g tfx-cli
             displayName: Install dependencies
+          - bash: |
+              set -ex
+              haxelib setup ~/haxelib
+              haxelib install HaxeTool/build.hxml --always
+            displayName: Install Haxe libraries
           - bash: make
             displayName: Build
           - bash: |

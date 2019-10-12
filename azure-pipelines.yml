@@ -46,3 +46,8 @@ stages:
             env:
               AZURE_TOKEN: $(AZURE_TOKEN)
             displayName: publish extension
+
+trigger:
+  tags:
+    include:
+      - v*

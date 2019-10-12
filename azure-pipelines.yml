@@ -28,7 +28,7 @@ stages:
               [ "`jq -r .version HaxeTool/package.json`" == "`jq -r .version HaxeTool/package-lock.json`" ]
             displayName: Check version
   - stage: StagePublish
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), variables['AZURE_TOKEN'])
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), variables['AZURE_TOKEN'])
     jobs:
       - job: Publish
         pool:

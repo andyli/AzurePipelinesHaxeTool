@@ -19,11 +19,7 @@ stages:
             displayName: Install Haxe libraries
           - bash: make
             displayName: Build
-          - bash: |
-              VSIXFILE=`echo *.vsix`
-              echo "##vso[task.setvariable variable=VSIXFILE]$VSIXFILE"
-            displayName: set VSIXFILE variable
-          - publish: $[ variables.VSIXFILE ]
+          - publish: output
             artifact: vsix
   - stage: StagePublish
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), variables['AZURE_TOKEN'])

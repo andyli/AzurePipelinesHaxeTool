@@ -1,6 +1,6 @@
 {
-  "name": "use-haxe-version",
-  "version": "0.1.16",
+  "name": "azure-pipelines-haxe-tool",
+  "version": "0.1.17",
   "description": "Retrieves the specified version of Haxe from the tool cache. Optionally add it to PATH.",
   "main": "main.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "Andy Li <andy@onthewings.net>",
   "license": "MIT",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0",
+    "azure-pipelines-task-lib": "^2.9.3",
     "azure-pipelines-tool-lib": "^0.12.0",
     "node-fetch": "^2.6.0"
   }

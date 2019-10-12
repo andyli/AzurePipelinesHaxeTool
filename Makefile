@@ -23,3 +23,4 @@ publish: always $(VSIXFILE)
 	@tfx extension publish --vsix $(VSIXFILE) --token $(AZURE_TOKEN)
 
 .PHONY: all vsix always publish
+.INTERMEDIATE: HaxeTool/main.js HaxeTool/node_modules

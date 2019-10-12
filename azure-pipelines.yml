@@ -7,6 +7,12 @@ stages:
         steps:
           - bash: |
               set -ex
+              [ "`jq -r .version vss-extension.json`" == "`jq -r '.version | "\(.Major).\(.Minor).\(.Patch)"' HaxeTool/task.json`" ]
+              [ "`jq -r .version vss-extension.json`" == "`jq -r .version HaxeTool/package.json`" ]
+              [ "`jq -r .version HaxeTool/package.json`" == "`jq -r .version HaxeTool/package-lock.json`" ]
+            displayName: Check version
+          - bash: |
+              set -ex
               sudo add-apt-repository ppa:haxe/haxe3.4 -y
               sudo apt update -y
               sudo apt install -qqy haxe jq
@@ -21,12 +27,6 @@ stages:
             displayName: Build
           - publish: output
             artifact: vsix
-          - bash: |
-              set -ex
-              [ "`jq -r .version vss-extension.json`" == "`jq -r '.version | "\(.Major).\(.Minor).\(.Patch)"' HaxeTool/task.json`" ]
-              [ "`jq -r .version vss-extension.json`" == "`jq -r .version HaxeTool/package.json`" ]
-              [ "`jq -r .version HaxeTool/package.json`" == "`jq -r .version HaxeTool/package-lock.json`" ]
-            displayName: Check version
   - stage: StagePublish
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), variables['AZURE_TOKEN'])
     jobs:
@@ -34,6 +34,10 @@ stages:
         pool:
           vmImage: 'ubuntu-16.04'
         steps:
+          - bash: |
+              set -ex
+              [ "$(Build.SourceBranch)" == "refs/tags/v`jq -r .version vss-extension.json`" ]
+            displayName: Check tag name
           - bash: |
               set -ex
               sudo apt update -y

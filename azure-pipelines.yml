@@ -44,8 +44,10 @@ stages:
               sudo apt install -qqy jq
               sudo npm install -g tfx-cli
             displayName: Install dependencies
-          - download: current
-            artifact: output
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: output
+              path: $(Build.SourcesDirectory)/output
           - bash: make publish
             env:
               AZURE_TOKEN: $(AZURE_TOKEN)

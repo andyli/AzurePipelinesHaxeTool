@@ -2,10 +2,10 @@ all: vsix
 
 always:
 
-UseHaxeVersion/main.js: always
-	haxe --cwd UseHaxeVersion build.hxml
+HaxeTool/main.js: always
+	haxe --cwd HaxeTool build.hxml
 
-vsix: UseHaxeVersion/main.js
+vsix: HaxeTool/main.js
 	tfx extension create --manifest-globs vss-extension.json
 
 .PHONY: all vsix always

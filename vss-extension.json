@@ -14,7 +14,7 @@
         "Azure Pipelines"
     ],
     "icons": {
-        "default": "images/icon.png"
+        "default": "images/haxe-logo-glyph.png"
     },
     "files": [
         {
@@ -39,5 +39,10 @@
     "repository": {
         "type": "git",
         "uri": "https://github.com/andyli/AzurePipelinesHaxeTool"
+    },
+    "content": {
+        "details": {
+            "path": "overview.md"
+        }
     }
 }

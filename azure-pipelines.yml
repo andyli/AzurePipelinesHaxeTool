@@ -28,7 +28,7 @@ stages:
           - publish: output
             artifact: vsix
   - stage: StagePublish
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), variables['AZURE_TOKEN'])
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), '$(AZURE_TOKEN)')
     jobs:
       - job: Publish
         pool:

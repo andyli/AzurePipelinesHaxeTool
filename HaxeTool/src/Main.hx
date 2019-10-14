@@ -41,10 +41,10 @@ class Main {
         };
     }
 
-    static function nekoUrl(version:String):String {
+    static function nekoUrl(version:String, arch:Int):String {
         var file = switch (platform) {
             case "win32":
-                'neko-${version}-win.zip';
+                'neko-${version}-win${arch == 64 ? "64" : ""}.zip';
             case "darwin":
                 'neko-${version}-osx64.tar.gz';
             case "linux":
@@ -101,8 +101,8 @@ class Main {
             });
     }
 
-    static function acquireNeko(version:String):Promise<String> {
-        var url = nekoUrl(version);
+    static function acquireNeko(version:String, arch:Int):Promise<String> {
+        var url = nekoUrl(version, arch);
         var fileName = Path.withoutDirectory(url);
         return Tool.downloadTool(url)
             .then(function(downloadPath:String) {
@@ -115,7 +115,7 @@ class Main {
             })
             .then(function(extPath:String) {
                 var subDir = getOnlySubDir(extPath);
-                return Tool.cacheDir(subDir, "neko", version);
+                return Tool.cacheDir(subDir, "neko", version, arch == 32 ? "x86" : "x64");
             });
     }
 
@@ -169,12 +169,22 @@ class Main {
                     queryLatestHaxeVersionMatch(versionSpec);
             }
 
-            var nekoInstallDir:Promise<String> = switch (Tool.findLocalTool("neko", nekoVersion)) {
-                case null:
-                    acquireNeko(nekoVersion);
-                case p:
-                    Promise.resolve(p);
-            };
+            var nekoInstallDir:Promise<String> =
+                haxeVersion.then(function(haxeVersion:String) {
+                    var nekoArch = switch ([platform, haxeVersion]) {
+                        case ["win32", "development"]: 64;
+                        case ["win32", v] if (Std.parseInt(v.split(".")[0]) >= 4): 64;
+                        case ["win32", _]: 32;
+                        case _: 64;
+                    }
+                    return switch (Tool.findLocalTool("neko", nekoVersion, nekoArch == 32 ? "x86" : "x64")) {
+                        case null:
+                            acquireNeko(nekoVersion, nekoArch);
+                        case p:
+                            p;
+                    };
+                });
+
             var haxeInstallDir:Promise<String> = haxeVersion.then(function(haxeVersion:String) {
                 return switch (haxeVersion) {
                     case "development":

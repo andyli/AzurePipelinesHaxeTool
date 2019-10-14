@@ -10,10 +10,10 @@ extern class Tool {
     static public function isExplicitVersion(args:Rest<Dynamic>):Dynamic;
     static public function cleanVersion(args:Rest<Dynamic>):Dynamic;
     static public function evaluateVersions(versions:Array<String>, versionSpec:String):String;
-    static public function findLocalTool(args:Rest<Dynamic>):Dynamic;
-    static public function findLocalToolVersions(args:Rest<Dynamic>):Dynamic;
+    static public function findLocalTool(toolName:String, versionSpec:String, ?arch:String):Dynamic;
+    static public function findLocalToolVersions(toolName:String, ?arch:String):Dynamic;
     static public function downloadTool(fileUrl:String):Promise<String>;
-    static public function cacheDir(args:Rest<Dynamic>):Promise<String>;
+    static public function cacheDir(sourceDir:String, tool:String, version:String, ?arch:String):Promise<String>;
     static public function cacheFile(args:Rest<Dynamic>):Dynamic;
     static public function extract7z(args:Rest<Dynamic>):Promise<String>;
     static public function extractTar(args:Rest<Dynamic>):Promise<String>;

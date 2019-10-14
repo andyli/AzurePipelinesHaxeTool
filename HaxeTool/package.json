@@ -1,6 +1,6 @@
 {
   "name": "azure-pipelines-haxe-tool",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "Retrieves the specified version of Haxe from the tool cache. Optionally add it to PATH.",
   "main": "main.js",
   "scripts": {

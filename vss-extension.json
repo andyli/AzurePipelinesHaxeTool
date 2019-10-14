@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "990B3EB1-135C-4701-AF8A-F235EAFDD9F3",
     "name": "HaxeTool",
-    "version": "0.1.20",
+    "version": "0.1.21",
     "publisher": "onthewings",
     "targets": [
         {

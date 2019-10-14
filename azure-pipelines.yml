@@ -27,44 +27,97 @@ stages:
             displayName: Build
           - publish: output
             artifact: output
-  - stage: StagePublish
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), '$(AZURE_TOKEN)')
+  # - stage: StagePublish
+  #   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'), '$(AZURE_TOKEN)')
+  #   jobs:
+  #     - job: Publish
+  #       pool:
+  #         vmImage: 'ubuntu-16.04'
+  #       steps:
+  #         - bash: |
+  #             set -ex
+  #             [ "$(Build.SourceBranch)" == "refs/tags/v`jq -r .version vss-extension.json`" ]
+  #           displayName: Check tag name
+  #         - bash: |
+  #             set -ex
+  #             sudo apt update -y
+  #             sudo apt install -qqy jq
+  #             sudo npm install -g tfx-cli
+  #           displayName: Install dependencies
+  #         - task: DownloadPipelineArtifact@2
+  #           inputs:
+  #             artifact: output
+  #             path: $(Build.SourcesDirectory)/output
+  #         - bash: make publish
+  #           env:
+  #             AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
+  #           displayName: Publish extension
+  #         - bash: |
+  #             set -ex
+  #             curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  #             az extension add --name azure-devops
+  #             az devops configure --defaults organization=https://dev.azure.com/onthewings
+  #           displayName: Setup Azure CLI
+  #         - bash: |
+  #             set -ex
+  #             INSTALLED_VERSION=`az devops extension show --publisher-name onthewings --extension-name 990B3EB1-135C-4701-AF8A-F235EAFDD9F3 | jq -r .version`
+  #             [ "${INSTALLED_VERSION}" == "`jq -r .version vss-extension.json`" ]
+  #           env:
+  #             AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
+  #           displayName: Check published version
+  - stage: StageCheck
     jobs:
-      - job: Publish
+      - job: Check
+        strategy:
+          matrix:
+            linux_haxe_dev:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: 'development'
+            linux_haxe_3.4.7:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3.4.7'
+            linux_haxe_3.4:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3.4'
+            linux_haxe_3:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3'
+            mac_haxe_dev:
+              vmImage: 'macOS-10.14'
+              haxe_ver: 'development'
+            mac_haxe_3.4.7:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3.4.7'
+            mac_haxe_3.4:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3.4'
+            mac_haxe_3:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3'
+            win_haxe_dev:
+              vmImage: 'windows-2019'
+              haxe_ver: 'development'
+            win_haxe_3.4.7:
+              vmImage: 'windows-2019'
+              haxe_ver: '3.4.7'
+            win_haxe_3.4:
+              vmImage: 'windows-2019'
+              haxe_ver: '3.4'
+            win_haxe_3:
+              vmImage: 'windows-2019'
+              haxe_ver: '3'
         pool:
-          vmImage: 'ubuntu-16.04'
+          vmImage: $(vmImage)
         steps:
-          - bash: |
-              set -ex
-              [ "$(Build.SourceBranch)" == "refs/tags/v`jq -r .version vss-extension.json`" ]
-            displayName: Check tag name
-          - bash: |
-              set -ex
-              sudo apt update -y
-              sudo apt install -qqy jq
-              sudo npm install -g tfx-cli
-            displayName: Install dependencies
-          - task: DownloadPipelineArtifact@2
+          - task: HaxeTool@0
             inputs:
-              artifact: output
-              path: $(Build.SourcesDirectory)/output
-          - bash: make publish
-            env:
-              AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
-            displayName: Publish extension
+              versionSpec: $(haxe_ver)
           - bash: |
               set -ex
-              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-              az extension add --name azure-devops
-              az devops configure --defaults organization=https://dev.azure.com/onthewings
-            displayName: Setup Azure CLI
-          - bash: |
-              set -ex
-              INSTALLED_VERSION=`az devops extension show --publisher-name onthewings --extension-name 990B3EB1-135C-4701-AF8A-F235EAFDD9F3 | jq -r .version`
-              [ "${INSTALLED_VERSION}" == "`jq -r .version vss-extension.json`" ]
-            env:
-              AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
-            displayName: Check published version
+              haxe -version
+              haxelib version
+              haxelib install jQueryExtern
+            displayName: Check functionality
 
 trigger:
   branches:

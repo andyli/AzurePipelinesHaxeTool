@@ -194,6 +194,11 @@ class Main {
                 haxeInstallDir.then(handleHaxeInstallPath),
             ])
                 .then(function(v) {
+                    var haxelibConfig = Path.join([Task.getVariable("Pipeline.Workspace"), "haxelib"]);
+                    Task.mkdirP(haxelibConfig);
+                    Task.execSync("haxelib", ["setup", haxelibConfig]);
+                })
+                .then(function(v) {
                     Task.setResult(TaskResult.Succeeded, "");
                 })
                 .catchError(function(e:js.Error){

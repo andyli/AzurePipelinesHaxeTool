@@ -50,8 +50,21 @@ stages:
               path: $(Build.SourcesDirectory)/output
           - bash: make publish
             env:
-              AZURE_TOKEN: $(AZURE_TOKEN)
-            displayName: publish extension
+              AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
+            displayName: Publish extension
+          - bash: |
+              set -ex
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+              az extension add --name azure-devops
+              az devops configure --defaults organization=https://dev.azure.com/onthewings
+            displayName: Setup Azure CLI
+          - bash: |
+              set -ex
+              INSTALLED_VERSION=`az devops extension show --publisher-name onthewings --extension-name 990B3EB1-135C-4701-AF8A-F235EAFDD9F3 | jq -r .version`
+              [ "${INSTALLED_VERSION}" == "`jq -r .version vss-extension.json`" ]
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
+            displayName: Check published version
 
 trigger:
   branches:

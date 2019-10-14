@@ -20,7 +20,7 @@ $(VSIXFILE): HaxeTool/main.js HaxeTool/node_modules
 vsix: $(VSIXFILE)
 
 publish: always $(VSIXFILE)
-	@tfx extension publish --vsix $(VSIXFILE) --token $(AZURE_TOKEN)
+	@tfx extension publish --vsix $(VSIXFILE) --token $(AZURE_DEVOPS_EXT_PAT)
 
 .PHONY: all vsix always publish
 .INTERMEDIATE: HaxeTool/main.js HaxeTool/node_modules

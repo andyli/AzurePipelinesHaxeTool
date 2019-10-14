@@ -65,6 +65,59 @@ stages:
             env:
               AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
             displayName: Check published version
+  - stage: StageCheck
+    jobs:
+      - job: Check
+        strategy:
+          matrix:
+            linux_haxe_dev:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: 'development'
+            linux_haxe_3.4.7:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3.4.7'
+            linux_haxe_3.4:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3.4'
+            linux_haxe_3:
+              vmImage: 'ubuntu-16.04'
+              haxe_ver: '3'
+            mac_haxe_dev:
+              vmImage: 'macOS-10.14'
+              haxe_ver: 'development'
+            mac_haxe_3.4.7:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3.4.7'
+            mac_haxe_3.4:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3.4'
+            mac_haxe_3:
+              vmImage: 'macOS-10.14'
+              haxe_ver: '3'
+            win_haxe_dev:
+              vmImage: 'windows-2019'
+              haxe_ver: 'development'
+            win_haxe_3.4.7:
+              vmImage: 'windows-2019'
+              haxe_ver: '3.4.7'
+            win_haxe_3.4:
+              vmImage: 'windows-2019'
+              haxe_ver: '3.4'
+            win_haxe_3:
+              vmImage: 'windows-2019'
+              haxe_ver: '3'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: HaxeTool@0
+            inputs:
+              versionSpec: $(haxe_ver)
+          - bash: |
+              set -ex
+              haxe -version
+              haxelib version
+              haxelib install jQueryExtern
+            displayName: Check functionality
 
 trigger:
   branches:

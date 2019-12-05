@@ -60,8 +60,19 @@ stages:
             displayName: Setup Azure CLI
           - bash: |
               set -ex
-              INSTALLED_VERSION=`az devops extension show --publisher-name onthewings --extension-name 990B3EB1-135C-4701-AF8A-F235EAFDD9F3 | jq -r .version`
-              [ "${INSTALLED_VERSION}" == "`jq -r .version vss-extension.json`" ]
+
+              DEPLOY_VERSION=`jq -r '.version | "\(.Major).\(.Minor).\(.Patch)"' HaxeTool/task.json`
+
+              function queryVersion()
+              {
+                curl https://dev.azure.com/onthewings/_apis/distributedtask/tasks/990B3EB1-135C-4701-AF8A-F235EAFDD9F3 -u :${AZURE_DEVOPS_EXT_PAT} | jq -r '.value[0].version | "\(.major).\(.minor).\(.patch)"'
+              }
+              
+              until [ "$(queryVersion)" == "${DEPLOY_VERSION}" ];
+              do
+                echo "Wait 10s..."
+                sleep 10s
+              done
             env:
               AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
             displayName: Check published version

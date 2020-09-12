@@ -17,6 +17,6 @@
   "dependencies": {
     "azure-pipelines-task-lib": "^2.9.3",
     "azure-pipelines-tool-lib": "^0.12.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   }
 }
